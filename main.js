@@ -3,6 +3,19 @@ function initialize () {
     postToSlack("Initialization succeeded.");
 }
 
+function postChartAsync1 () {
+    postImageToSlack("Weightman summary", getChart().getBlob());
+    ScriptApp.getProjectTriggers().forEach(function (trigger) {
+        if (trigger.getHandlerFunction() == "postChartAsync1") {
+            ScriptApp.deleteTrigger(trigger);
+        }
+    });
+}
+
+function postChartAsync () {
+    ScriptApp.newTrigger("postChartAsync1").timeBased().after(1).create();
+}
+
 function doActionReport (params) {
     openSlackModal(params.trigger_id, {
         type: "modal",
@@ -32,8 +45,8 @@ function doSubmitReport (params) {
     var value = params.view.state.values.weight.weight_value.value;
 
     appendRow(today, value);
+    postChartAsync();
 
-    postImageToSlack("Weightman summary", getChart().getBlob());
     postToSlack("", [{
         type: "section",
         text: { type: "mrkdwn", text: "Weight reported ! " + formatDate(today) + " = " + value },
@@ -88,8 +101,8 @@ function doSubmitEdit (params) {
     var newvalue = params.view.state.values.weight.weight_value.value;
 
     updateLastValue(newvalue);
+    postChartAsync();
 
-    postImageToSlack("Weightman summary", getChart().getBlob());
     postToSlack("", [{
         type: "section",
         text: { type: "mrkdwn", text: "Weight updated to : " + newvalue },
@@ -123,8 +136,8 @@ function doActionDelete (params) {
 
 function doSubmitDelete (params) {
     deleteLastRow();
+    postChartAsync();
 
-    postImageToSlack("Weightman summary", getChart().getBlob());
     postToSlack("Deleted the last weight report.");
 
     return ContentService.createTextOutput(JSON.stringify({
