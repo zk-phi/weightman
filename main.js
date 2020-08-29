@@ -41,15 +41,14 @@ function doActionReport (params) {
 }
 
 function doSubmitReport (params) {
-    var today = new Date();
     var value = params.view.state.values.weight.weight_value.value;
 
-    appendRow(today, value);
+    updateLastValue(value);
     postChartAsync();
 
     postToSlack("", [{
         type: "section",
-        text: { type: "mrkdwn", text: "Weight reported ! " + formatDate(today) + " = " + value },
+        text: { type: "mrkdwn", text: "Weight reported ! " + value },
         accessory: {
             type: "button",
             text: { type: "plain_text", text: ":pencil2:", emoji: true },
@@ -146,6 +145,7 @@ function doSubmitDelete (params) {
 }
 
 function doTimer () {
+    appendRow(new Date());
     postToSlack("", [{
         type: "section",
         text: { type: "mrkdwn", text: "It's time to report today's weight~" }
