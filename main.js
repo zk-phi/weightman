@@ -16,49 +16,6 @@ function postChartAsync () {
     ScriptApp.newTrigger("postChartAsync1").timeBased().after(1).create();
 }
 
-function doActionReport (params) {
-    openSlackModal(params.trigger_id, {
-        type: "modal",
-        title: { type: "plain_text", text: "Input weight" },
-        callback_id: "report",
-        submit: { type: "plain_text", text: "Save" },
-        close: { type: "plain_text", text: "Close" },
-        blocks: [
-            {
-                type: "input",
-                element: {
-                    type: "plain_text_input",
-                    initial_value: "0",
-                    action_id: "weight_value"
-                },
-                label: { type: "plain_text", text: "Weight" },
-                block_id: "weight"
-            }
-        ]
-    });
-
-    return ContentService.createTextOutput("");
-}
-
-function doSubmitReport (params) {
-    var value = params.view.state.values.weight.weight_value.value;
-
-    updateLastValue(value);
-    postChartAsync();
-
-    postToSlack("", [{
-        type: "section",
-        text: { type: "mrkdwn", text: "Weight reported ! " + value },
-        accessory: {
-            type: "button",
-            text: { type: "plain_text", text: ":pencil2:", emoji: true },
-            action_id: "edit"
-        }
-    }]);
-
-    return ContentService.createTextOutput("");
-}
-
 function doActionEdit (params) {
     var value = getLastValue();
 
@@ -104,7 +61,7 @@ function doSubmitEdit (params) {
 
     postToSlack("", [{
         type: "section",
-        text: { type: "mrkdwn", text: "Weight updated to : " + newvalue },
+        text: { type: "mrkdwn", text: "Weight report updated ! weight = " + newvalue },
         accessory: {
             type: "button",
             text: { type: "plain_text", text: ":pencil2:", emoji: true },
@@ -154,7 +111,7 @@ function doTimer () {
         elements: [{
             type: "button",
             text: { type: "plain_text", text: "Start input" },
-            action_id: "report"
+            action_id: "edit"
         }]
     }]);
 }
@@ -167,9 +124,7 @@ function doPost (e) {
 
     if (params.type) {
         if (params.type == 'block_actions') {
-            if (params.actions[0].action_id == "report") {
-                return doActionReport(params);
-            } else if (params.actions[0].action_id == "edit") {
+            if (params.actions[0].action_id == "edit") {
                 return doActionEdit(params);
             } else if (params.actions[0].action_id == "delete") {
                 return doActionDelete(params);
@@ -177,9 +132,7 @@ function doPost (e) {
                 throw "Unknown action";
             }
         } else if (params.type == 'view_submission') {
-            if (params.view.callback_id == "report") {
-                return doSubmitReport(params);
-            } else if (params.view.callback_id == "edit") {
+            if (params.view.callback_id == "edit") {
                 return doSubmitEdit(params);
             } else if (params.view.callback_id == "delete") {
                 return doSubmitDelete(params);
