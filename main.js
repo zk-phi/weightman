@@ -1,3 +1,8 @@
+function isNightTime () {
+    const hour = (new Date()).getHours();
+    return hour < END_OF_DATE_TIME || hour >= START_OF_NIGHT_TIME;
+}
+
 function initialize () {
     initializeSheet();
     postToSlack("Initialization succeeded.");
@@ -17,7 +22,7 @@ function postChartAsync () {
 }
 
 function doActionEdit (params) {
-    var value = getLastValue();
+    var value = getLastValue(isNightTime() ? 1 : 0);
 
     openSlackModal(params.trigger_id, {
         type: "modal",
@@ -56,7 +61,7 @@ function doActionEdit (params) {
 function doSubmitEdit (params) {
     var newvalue = params.view.state.values.weight.weight_value.value;
 
-    updateLastValue(newvalue);
+    updateLastValue(isNightTime() ? 1 : 0, newvalue);
     postChartAsync();
 
     postToSlack("", [{
@@ -99,6 +104,20 @@ function doSubmitDelete (params) {
     return ContentService.createTextOutput(JSON.stringify({
         response_action: "clear"
     })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doNightTimer () {
+    postToSlack("", [{
+        type: "section",
+        text: { type: "mrkdwn", text: "You may report weight before sleep~" }
+    }, {
+        type: "actions",
+        elements: [{
+            type: "button",
+            text: { type: "plain_text", text: "Start input" },
+            action_id: "edit"
+        }]
+    }]);
 }
 
 function doTimer () {

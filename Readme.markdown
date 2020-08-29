@@ -137,6 +137,16 @@ type: date
 time: <time you usually wake up>
 ```
 
+If you want to report weight before sleep too, you may set doNightTimer in addition.
+
+```
+function: doNightTimer
+version: HEAD
+source: time-based
+type: date
+time: <time you want to be notified>
+```
+
 # Development
 
 When you modify the app and want to update the deployment, you can use `-i` option to redeploy without changing the public URL. If `-i` is omitted, you'll have multiple deployments with different versions, in different URLs.
