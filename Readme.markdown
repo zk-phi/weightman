@@ -113,6 +113,8 @@ In your Slack workspace,
 
 ## Initialize & authorize the GAS app to use Google APIs
 
+WARNING: Following operation will clear and initialize the current spread sheet. If you have any content in the sheet which you don't want to be deleted, backup that before proceeding.
+
 Open `main.gs` in the GAS app page and run `initialize` function manually from the menu `Execute` > `Execute a function` > `intialize`.
 
 You'll be asked to permit the app to use Google Spreadsheet API and outgoing hooks.
